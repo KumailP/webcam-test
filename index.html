@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style type="text/css">
+      .container {
+        width: 80vw;
+        height: 80vh;
+        position: relative;
+        border: 1px solid #D3D3D3;
+        /* float: left; */
+      }
+      .container video {
+        width: 100vw;
+        height: 100vh;
+        overflow:hidden;
+        position: absolute;
+        object-fit: cover;
+      }
+      .container .photoArea {
+        border: 2px dashed white;
+        width: 183px;
+        height: 660px;
+        position: relative;
+        margin: 0 auto;
+        /* margin-left: 408.5px; */
+        top: 40px;
+      }
+      canvas,
+      img {
+        float: left;
+      }
+      .controls {
+        clear: both;
+      }
+    </style>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <video id="video" autoplay></video>
+      <div class="photoArea" id="main"></div>
+    </div>
+    <canvas width="183" height="660" style="border: 1px solid #D3D3D3"></canvas>
+    <img width="183" height="660" />
+    <div class="controls">
+      <input type="button" value="start capture" onclick="startCapture()" />
+      <input type="button" value="take snapshot" onclick="takePhoto()" />
+      <input type="button" value="stop capture" onclick="stopCapture()" />
+    </div>
+    <script type="text/javascript">
+      var localMediaStream = null;
+      var video = document.querySelector("video");
+      var canvas = document.querySelector("canvas");
+      function takePhoto() {
+        if (localMediaStream) {
+          var ctx = canvas.getContext("2d");
+          //ctx.drawImage(video, 0, 0, 320, 240); // original draw image
+          //ctx.drawImage(video, 0, 0, 640, 480, 0, 0, 320, 240); // entire image
+          //instead of
+          // ctx.drawImage(video, 90, 40, 140, 190, 0, 0, 140, 190);
+          // we double the source coordinates
+          // ctx.drawImage(video, 260, 80, 266, 1320, 0, 0, 183, 660);
+          ctx.drawImage(video, 260, 26, 120, 420, 0, 0, 183, 660);
+          document.querySelector("img").src = canvas.toDataURL("image/jpeg");
+        }
+      }
+      navigator.getUserMedia =
+        navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia;
+      window.URL = window.URL || window.webkitURL;
+      
+      function stopCapture() {
+        video.pause();
+        localMediaStream.stop();
+      }
+      navigator.getUserMedia(
+          { video: true },
+          function (stream) {
+            video.srcObject = stream;
+            localMediaStream = stream;
+          },
+          function (e) {
+            console.log(e);
+          }
+        );
+    </script>
+  </body>
+</html>
